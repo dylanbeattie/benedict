@@ -1,4 +1,4 @@
-import Adder from './adder.ts';
+import Adder from './adder';
 
 let adder = new Adder(5);
 let h1 = document.querySelector("h1");
