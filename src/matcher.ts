@@ -1,4 +1,4 @@
-import 'string.extensions';
+import './strings';
 
 export default class Matcher {
 	#text: string;
