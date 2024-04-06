@@ -2,13 +2,13 @@ import './strings';
 
 export default class Matcher {
 	#text: string;
+	tokens: string[];
+	spaces: string[];
 	constructor(text: string) {
 		this.#text = text;
-		let tokens = text.split(/\b/g);
-		if (tokens.length == 0) return;
-		if (! tokens[1].isWord()) tokens.unshift('');
-		if (! tokens[tokens.length-1].isWord()) tokens.push('');
+		[ this.tokens, this.spaces ] = text.unzip();
 	}
+
 	/**
 	 * Return the index of the last character of the
 	 * sequence of formatted, punctuated text that
