@@ -8,3 +8,6 @@ export default class Adder {
 		return this.#x + y;
 	}
 }
+
+let adder = new Adder(5);
+console.log(adder.add(3));
