@@ -25,13 +25,16 @@ export default class Matcher {
 	 * new Matcher('Hey, you? Can I... help?').match('hey you can');
 	 */
 	match(fragment: string): number {
-		let needle = fragment.toLowerCase().split(' ').join('').trim();
-		const lastWordInFragment = (fragment.split(' ').pop() ?? '').toLowerCase();
+		let needle = fragment.replace(/[\W]/g, '').toLowerCase();
+		console.log(needle);
+		const lastWordInFragment = (fragment.split(/\W+/).pop() ?? '').toLowerCase();
 		let position = this.haystack.indexOf(needle);
 		if (position < 0) return position;
-		position += needle.length-1;
+
+		position += needle.length - 1;
 		let indexOfFinalSpace = this.tokens.indexOfPosition(position);
 		if (indexOfFinalSpace < 0) return indexOfFinalSpace;
+
 		let indexOfFinalToken = indexOfFinalSpace;
 		if (this.tokens[indexOfFinalSpace - 1] === lastWordInFragment) indexOfFinalToken--;
 		let tokensToCount = this.tokens.slice(0, indexOfFinalToken);

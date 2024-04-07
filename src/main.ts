@@ -1,7 +1,16 @@
-import Adder from './adder';
+import Matcher from './matcher';
 
-let adder = new Adder(5);
-let h1 = document.querySelector("h1");
-h1.innerHTML = adder.add(5).toString();
+let div = document.querySelector("div#playback");
+let matcher = new Matcher(div.innerText);
+let input = document.querySelector("input");
+input?.addEventListener("keyup", function() {
+    var index = matcher.match(this.value.trim());
+    console.log(index);
+    var text = div.innerText;
+    let html = `<span>${text.substring(0,index)}</span>${text.substring(index)}`;
+    html = html.replace(/\n/g, '<br />\n');
+    div.innerHTML = html;
+});
+
 
 

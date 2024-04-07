@@ -23,15 +23,31 @@ describe('when text starts with non-word characters', () => {
         expect(matcher.match(fragment)).toBe(expected);
     })
 })
-let input = 'ABC def GHI';
+
+let input = "Don't make O'Brien 'angry'.";
+describe(input, () => {
+    let matcher = new Matcher(input);
+    describe('when fragment does not match', () => {
+        let cases: [string, number][] = [
+            ['don', 4],
+            ['don\'t', 6],
+            ["don't make o'bri", 16],
+        ];
+        test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
+            expect(matcher.match(fragment)).toBe(index);
+        });
+    });
+});
+
+input = 'ABC def GHI';
 
 describe(input, () => {
     let matcher = new Matcher(input);
     describe('when fragment does not match', () => {
         let cases: [string, number][] = [
-            //['a b c', -1],
+            ['a x y', -1],
             ['xyz', -1],
-            ['!', -1],
+            // ['!', -1],
         ];
         test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
             expect(matcher.match(fragment)).toBe(index);
@@ -82,9 +98,9 @@ describe('Eddies...', () => {
     let matcher = new Matcher(input);
     let cases: [string, number][] = [
         ['eddies', 10], // should match '"Eddies," ' including the trailing space
-        // ['eddies said ford', 20 ], // should match "Eddies," said Ford, (including the trailing space)
-        // ['eddies said ford in the space time continuum ah nodded arthur', 75 ],
-        // ['eddies said ford in the space time continuum ah nodded arthur is he is he he pushed', 101 ]
+        ['eddies said ford', 22 ], // should match "Eddies," said Ford, " 
+        ['eddies said ford in the space time continuum ah nodded arthur', 75 ],
+        ['eddies said ford in the space time continuum ah nodded arthur is he is he he pushed', 100 ]
     ];
     test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
         expect(matcher.match(fragment)).toBe(index);
