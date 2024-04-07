@@ -1,9 +1,12 @@
+import '../src/arrays';
+
 describe('Array.zip', () => {
 	let cases = [
 		[[], [1, 2, 3], [1, 2, 3]],
 		[[1, 2, 3], [], [1, 2, 3]],
 		[['a', 'b', 'c'], [1, 2, 3], ['a', 1, 'b', 2, 'c', 3]],
 		[[1, 2, 3], ['a', 'b', 'c', 'd', 'e'], [1, 'a', 2, 'b', 3, 'c', 'd', 'e']],
+		[['a'], [' '], ['a', ' ']]
 	];
 	test.each(cases)('zip(%p,%p) == %p', (a: any[], b: any[], c: any[]) => {
 		expect(a.zip(b)).toStrictEqual(c);

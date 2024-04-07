@@ -19,8 +19,9 @@ Array.prototype.zip = function(arr: any[]) : any[] {
 	let result = [];
 	while(index < this.length) {
 		result.push(this[index]);
-		if (index++ < arr.length) result.push(arr[index]);
+		if (index < arr.length) result.push(arr[index]);
+		index++;
 	}
-	while (index++ < arr.length) result.push(arr[index]);
+	while (index < arr.length) result.push(arr[index++]);
 	return result;
 }
