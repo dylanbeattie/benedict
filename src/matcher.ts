@@ -30,14 +30,24 @@ export default class Matcher {
 		const position = this.haystack.indexOf(needle) + needle.length;
 		let indexOfFinalSpace = this.tokens.indexOfPosition(position);
 		let indexOfFinalToken = indexOfFinalSpace;
-		if (this.tokens[indexOfFinalSpace-1] === lastWordInFragment) indexOfFinalToken --;
+		if (this.tokens[indexOfFinalSpace-1] === lastWordInFragment) indexOfFinalToken--;
 		let tokensToCount = this.tokens.slice(0, indexOfFinalToken);
 		let spacesToCount = this.spaces.slice(0, indexOfFinalSpace);
 		var adjustedOffset = tokensToCount.concat(spacesToCount)
 			.reduce((sum, token) => sum + token.length, 0);
 		var targetToken = this.tokens[indexOfFinalSpace].toLowerCase();
 		console.log(lastWordInFragment, targetToken);
-		if (targetToken !== lastWordInFragment) return adjustedOffset + lastWordInFragment.length;
+		if (targetToken !== lastWordInFragment) {
+			if (lastWordInFragment.length > targetToken.length) {
+				console.log(position, indexOfFinalToken, lastWordInFragment, targetToken);
+				console.log(adjustedOffset);
+				console.log(this.spaces[indexOfFinalSpace-1].length);
+				return adjustedOffset + this.spaces[indexOfFinalSpace-1].length;
+			}
+			console.log('foo');
+			return adjustedOffset + lastWordInFragment.length;
+		}
+		console.log('bar');
 		return adjustedOffset + targetToken.length + this.spaces[indexOfFinalSpace].length;
 	}
 }

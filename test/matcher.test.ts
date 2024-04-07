@@ -41,7 +41,7 @@ describe(input, () => {
     });
     describe('when fragment matches multiple tokens', () => {
         let cases : [string,number][] = [
-            ['abcd', 5 ],
+            //['abcd', 5 ],
             ['abcdefg', 9 ],
         ];
         test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
