@@ -1,4 +1,5 @@
 import './strings';
+import './arrays';
 
 export default class Matcher {
 	originalText: string;
@@ -24,16 +25,21 @@ export default class Matcher {
 	 * // returns 12
 	 * new Matcher('Hey, you? Can I... help?').match('hey you can');
 	 */
-	match(fragment: string): number {
+	match(fragment: string, scope: number = 0): number {
 		let needle = fragment.replace(/[\W]/g, '').toLowerCase();
-		console.log(needle);
-		const lastWordInFragment = (fragment.split(/\W+/).pop() ?? '').toLowerCase();
-		let position = this.haystack.indexOf(needle);
+		let offset = 0;
+		if (scope > 0) {
+			offset = needle.length - (scope +1);
+			needle = needle.slice(-scope);
+		}
+		let position = this.haystack.indexOf(needle, offset);
 		if (position < 0) return position;
 
 		position += needle.length - 1;
 		let indexOfFinalSpace = this.tokens.indexOfPosition(position);
 		if (indexOfFinalSpace < 0) return indexOfFinalSpace;
+
+		const lastWordInFragment = (fragment.split(/\W+/).pop() ?? '').toLowerCase();
 
 		let indexOfFinalToken = indexOfFinalSpace;
 		if (this.tokens[indexOfFinalSpace - 1] === lastWordInFragment) indexOfFinalToken--;

@@ -3,21 +3,6 @@ interface String {
 	unzip(): [string[], string[]];
 }
 
-interface Array<T> {
-	indexOfPosition(position: number): number;
-}
-
-Array.prototype.indexOfPosition = function(position: number) : number {
-	let index = 0;
-	let totalLength = 0;
-	while (index < this.length) {
-		position -= this[index].length;
-		if (position < 0) return index;
-		index++;
-	}
-	return -1;
-}
-
 String.prototype.isWord = function (): boolean {
 	return /^\w+$/.test(this.toString());
 }

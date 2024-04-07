@@ -39,6 +39,31 @@ describe(input, () => {
     });
 });
 
+describe('match using window size', () => {
+    var matcher = new Matcher('xxxxx apple banjo');
+    let cases: [string,number,number][] = [
+        ['aaaaa apple', 5, 12],
+        ['aaaaa appal ban', 5, -1],
+        ['aaaaa appal banjo', 5, 17]
+    ];
+    test.each(cases)('%p %p %p', (fragment , scope, expected) => {
+        expect(matcher.match(fragment, scope)).toBe(expected);
+    });
+});
+
+
+describe('match using window size with punctuation', () => {
+    var matcher = new Matcher('"Bear-faced chic!" will probably be misinterpreted');
+    let cases: [string,number,number][] = [
+        // ['bare faced cheek will', 20, -1],
+        // ['bare faced cheek will probably be', 10, 36],
+        // ['bare-faced cheek will probably be', 10, 36],
+        ['bare faced cheek will probably be misint', 20, 42]
+    ];
+    test.each(cases)('%p %p %p', (fragment , scope, expected) => {
+        expect(matcher.match(fragment, scope)).toBe(expected);
+    });
+});
 input = 'ABC def GHI';
 
 describe(input, () => {
