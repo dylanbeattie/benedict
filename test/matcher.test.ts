@@ -17,19 +17,37 @@ let input = 'ABC def GHI';
 
 describe(input, () => {
     let matcher = new Matcher(input);
-    let cases : [string,number][] = [
-        ['', 0],
-        ['a', 1 ],
-        ['ab', 2 ],
-        ['abc', 4 ],
-        ['abcd', 5 ],
-        ['abc d', 5 ],
-        ['abc de', 6 ],
-        ['abc def', 8 ],
-    ];
-    test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
-        expect(matcher.match(fragment)).toBe(index);
+    describe('when fragment matches complete tokens', () => {
+        let cases : [string,number][] = [
+            ['', 0],
+            ['abc', 4 ],
+            ['abc def', 8 ],
+        ];
+        test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
+            expect(matcher.match(fragment)).toBe(index);
+        });
+
     });
+    describe('when fragment matches partial tokens', () => {
+        let cases : [string,number][] = [
+            ['a', 1 ],
+            ['ab', 2 ],
+            ['abc d', 5 ],
+            ['abc de', 6 ],
+        ];
+        test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
+            expect(matcher.match(fragment)).toBe(index);
+        });
+    });
+    describe('when fragment matches multiple tokens', () => {
+        let cases : [string,number][] = [
+            ['abcd', 5 ],
+            ['abcdefg', 9 ],
+        ];
+        test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
+            expect(matcher.match(fragment)).toBe(index);
+        });
+    }
 });
 
 input = `"Eddies," said Ford, "in the space-time continuum."

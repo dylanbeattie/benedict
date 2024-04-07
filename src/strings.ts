@@ -11,8 +11,8 @@ Array.prototype.indexOfPosition = function(position: number) : number {
 	let index = 0;
 	let totalLength = 0;
 	while (index < this.length) {
-		totalLength += this[index].length;
-		if (totalLength > position) return index;
+		position -= this[index].length;
+		if (position < 0) return index;
 		index++;
 	}
 	return -1;

@@ -7,8 +7,10 @@ export default class Matcher {
 	spaces: string[];
 	constructor(text: string) {
 		this.originalText = text;
-		[this.tokens, this.spaces] = text.unzip();
-		this.haystack = this.tokens.join('').toLowerCase().trim();
+		const [tokens, spaces] = text.unzip();
+		this.tokens = tokens.map(t => t.toLowerCase());
+		this.spaces = spaces;
+		this.haystack = this.tokens.join('').trim();
 	}
 
 	/**
@@ -24,28 +26,18 @@ export default class Matcher {
 	 */
 	match(fragment: string): number {
 		let needle = fragment.toLowerCase().split(' ').join('').trim();
-		const lastWordInFragment = fragment.split(' ').pop() ?? '';
-		// OK,
-		// Input is 'Apple... Banana? Carrot!'
-		// we have tokens [ 'Apple', 'Banana', 'Carrot' ]
-		// joining tokens give us 'apple banana carrot'
-		// indexOf('apple banana car') gives us 0
-		// 'apple banana car'.length gives 16
+		const lastWordInFragment = (fragment.split(' ').pop() ?? '').toLowerCase();
 		const position = this.haystack.indexOf(needle) + needle.length;
-		console.log(position);
-		let indexOfTarget = this.tokens.indexOfPosition(position);
-		console.log(needle, this.haystack, this.originalText);
-		console.log(indexOfTarget);
-		let tokensToCount = this.tokens.slice(0, indexOfTarget);
-		let spacesToCount = this.spaces.slice(0, indexOfTarget);
+		let indexOfFinalSpace = this.tokens.indexOfPosition(position);
+		let indexOfFinalToken = indexOfFinalSpace;
+		if (this.tokens[indexOfFinalSpace-1] === lastWordInFragment) indexOfFinalToken --;
+		let tokensToCount = this.tokens.slice(0, indexOfFinalToken);
+		let spacesToCount = this.spaces.slice(0, indexOfFinalSpace);
 		var adjustedOffset = tokensToCount.concat(spacesToCount)
 			.reduce((sum, token) => sum + token.length, 0);
-		var targetToken = this.tokens[indexOfTarget].toLowerCase();
-		console.log(lastWordInFragment);
-		console.log(targetToken);
+		var targetToken = this.tokens[indexOfFinalSpace].toLowerCase();
+		console.log(lastWordInFragment, targetToken);
 		if (targetToken !== lastWordInFragment) return adjustedOffset + lastWordInFragment.length;
-		console.log(adjustedOffset);
-
-		return adjustedOffset + targetToken.length + this.spaces[indexOfTarget].length;
+		return adjustedOffset + targetToken.length + this.spaces[indexOfFinalSpace].length;
 	}
 }
