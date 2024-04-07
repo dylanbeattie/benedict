@@ -1,5 +1,16 @@
 import '../src/strings';
 
+describe('lastWord() of ', () => {
+	let cases : [string,string][]= [
+		['big dog!', 'dog'],
+		['apple', 'apple'],
+		['No way...', 'way'],
+		['', ''],
+	];
+	test.each(cases)('%p is %p', (text: string, word: string) {
+		expect(text.lastWord()).toBe(word);
+	});
+})
 describe('unzip', () => {
 	let cases = {
 		'abc': [['abc'], ['']],

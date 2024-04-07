@@ -29,7 +29,7 @@ export default class Matcher {
 		let needle = fragment.replace(/[\W]/g, '').toLowerCase();
 		let offset = 0;
 		if (scope > 0) {
-			offset = needle.length - (scope +1);
+			offset = needle.length - (scope + 1);
 			needle = needle.slice(-scope);
 		}
 		let position = this.haystack.indexOf(needle, offset);
@@ -39,47 +39,24 @@ export default class Matcher {
 		let indexOfFinalSpace = this.tokens.indexOfPosition(position);
 		if (indexOfFinalSpace < 0) return indexOfFinalSpace;
 
-		const lastWordInFragment = (fragment.split(/\W+/).pop() ?? '').toLowerCase();
+		const lastWordInFragment = fragment.lastWord().toLowerCase();
 
 		let indexOfFinalToken = indexOfFinalSpace;
 		if (this.tokens[indexOfFinalSpace - 1] === lastWordInFragment) indexOfFinalToken--;
 		let tokensToCount = this.tokens.slice(0, indexOfFinalToken);
 		let spacesToCount = this.spaces.slice(0, indexOfFinalSpace);
-		
+
 		var targetToken = this.tokens[indexOfFinalSpace].toLowerCase();
 
-		var thingsToCount = tokensToCount.zip(spacesToCount);
-		if (targetToken !== lastWordInFragment) {
-			if (lastWordInFragment.length > targetToken.length) {
-				thingsToCount.push(this.spaces[indexOfFinalSpace - 1]);
-			} else {
-				thingsToCount.push(lastWordInFragment);
-			}
+		var allTheThings = tokensToCount.zip(spacesToCount);
+		if (lastWordInFragment.length > targetToken.length) {
+			allTheThings.push(this.spaces[indexOfFinalSpace - 1]);
 		} else {
-			thingsToCount.push(targetToken);
-			thingsToCount.push(this.spaces[indexOfFinalSpace]);
-		}
-		
-
-			// if (lastWordInFragment.length > targetToken.length) {
-		// 	thingsToCount.push(this.spaces[indexOfFinalSpace-1]);
-		// } else if (lastWordInFragment === targetToken) {
-		// 	thingsToCount.push(lastWordInFragment);
-		// } else {
-		// 	thingsToCount.push(targetToken);
-		// 	thingsToCount.push(this.spaces[indexOfFinalSpace]);
-		// }
-		console.log(thingsToCount);
-		return thingsToCount.reduce((length,token) => length + token.length,0);
-		
-		var adjustedOffset = tokensToCount.zip(spacesToCount)
-			.reduce((sum, token) => sum + token.length, 0);
-		if (targetToken !== lastWordInFragment) {
-			if (lastWordInFragment.length > targetToken.length) {
-				return adjustedOffset + this.spaces[indexOfFinalSpace - 1].length;
+			allTheThings.push(lastWordInFragment);
+			if (lastWordInFragment === targetToken) {
+				allTheThings.push(this.spaces[indexOfFinalSpace]);
 			}
-			return adjustedOffset + lastWordInFragment.length;
-		}
-		return adjustedOffset + targetToken.length + this.spaces[indexOfFinalSpace].length;
+		} 
+		return allTheThings.reduce((length, token) => length + token.length, 0);
 	}
 }

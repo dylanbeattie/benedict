@@ -1,4 +1,5 @@
 interface String {
+	lastWord(): string;
 	isWord(): boolean;
 	unzip(): [string[], string[]];
 }
@@ -6,6 +7,10 @@ interface String {
 String.prototype.isWord = function (): boolean {
 	return /^\w+$/.test(this.toString());
 }
+String.prototype.lastWord = function() : string {
+	return (this.split(/\W+/).filter(t => t.length > 0).pop() ?? '');
+}
+
 /**
  * returns a pair of arrays. One array contains the words in this string,
  * the other contains all the non-word sequences. Zipping them back together
