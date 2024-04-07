@@ -57,6 +57,6 @@ export default class Matcher {
 				allTheThings.push(this.spaces[indexOfFinalSpace]);
 			}
 		} 
-		return allTheThings.reduce((length, token) => length + token.length, 0);
+		return allTheThings.sum(token => token.length);
 	}
 }

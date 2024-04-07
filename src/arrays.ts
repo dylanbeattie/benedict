@@ -1,15 +1,17 @@
 interface Array<T> {
 	indexOfPosition(position: number): number;
 	zip(arr: Array<T>) : Array<T>;
+	sum(func : (value: T) => number) : number;
+}
+
+Array.prototype.sum = function(func: (value: any) => number) {
+	return this.reduce((sum,value) => sum += func(value), 0);
 }
 
 Array.prototype.indexOfPosition = function(position: number) : number {
-	let index = 0;
-	let totalLength = 0;
-	while (index < this.length) {
+	for(var index = 0; index < this.length; index++) {
 		position -= this[index].length;
 		if (position < 0) return index;
-		index++;
 	}
 	return -1;
 }

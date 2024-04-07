@@ -1,5 +1,17 @@
 import '../src/arrays';
 
+describe('sum', () => {
+	test('of numbers', () => {
+		expect([].sum(e => e)).toBe(0);
+		expect([1].sum(e => e)).toBe(1);
+		expect([1,2].sum(e => e)).toBe(3);
+	});
+	test('of strings', () => {
+		expect(['a'].sum(e => e.length)).toBe(1);
+		expect(['a','b'].sum(e => e.length)).toBe(2);
+		expect(['aa','bb'].sum(e => e.length)).toBe(4);
+	});
+})
 describe('Array.zip', () => {
 	let cases = [
 		[[], [1, 2, 3], [1, 2, 3]],
