@@ -1,27 +1,36 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
-    
-  <style>
-    input, div {
-      font-size: 300%;
-      padding: 10px;
-    }
-    span {
-      color: #f00;
-    }
-  </style></head>
-  <body>
-	<input type="text" id="input">
-  <div id="playback">
-    "Eddies", said Ford, "in the space-time continuum."<br />
-  <br />
-    Arthur looked baffled. "Who's Eddy?", he asked, " - and what is he doing in the space-time continuum?"
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vite + TS</title>
+  <link rel="stylesheet" href="styles.scss" />
+</head>
+<body>
+  <div id="toolbar">
+    <input type="button" id="playButton" value="Go" />
+    <label id="status">Ready</label>
   </div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+  <div id="prompter">
+    <hr />
+    <textarea>“I have detected,” he said, “disturbances in the wash.”
+“The wash?” said Arthur.
+“The space-time wash,” said Ford.
+Arthur nodded, and then cleared his throat.
+“Are we talking about,” he asked cautiously, “some sort of Vogon laundromat, or what are we talking about?”
+“Eddies,” said Ford, “in the space-time continuum.”
+“Ah,” nodded Arthur, “is he? Is he?” He pushed his hands into the pocket of his dressing gown and looked knowledgeably into the distance.
+“What?” said Ford.
+“Er, who,” said Arthur, “is Eddy, then, exactly?”
+Ford looked angrily at him.
+“Will you listen?” he snapped.
+“I have been listening,” said Arthur, “but I’m not sure it’s helped.”</textarea>
+    <div id="playback">
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>

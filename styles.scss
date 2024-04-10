@@ -1,0 +1,56 @@
+div#toolbar {
+    position: fixed;
+    top :0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background-color: #000;
+    color: #fff;
+    label#status {
+        padding: 16px;
+        display: block;
+        float: right;
+        color: #fff;
+    }
+}
+div#prompter {
+    position: fixed;
+    top: 54px;
+    left: 6px;
+    right:6px;
+    bottom: 6px;
+    padding: 4px;
+    background-color: #ff0;
+    textarea, div#playback {
+        font-size: 48px;
+        text-align: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 20px 200px;
+        line-height: 1.8em;
+        font-family: Lato, Arial, Helvetica, sans-serif;
+        overflow-y: scroll;
+        span.matched {
+            color: #f00;
+        }
+        span.guessed {
+            color: #00f;
+        }
+    }
+    textarea { 
+        display: none;
+    }
+    hr {
+        position: absolute;
+        border-width: 2px;
+        border-style: solid;
+        border-color: #f00;
+        left: 200px;
+        right: 200px;
+        top: 200px;
+        
+    }
+}

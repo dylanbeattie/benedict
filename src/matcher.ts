@@ -7,6 +7,10 @@ export default class Matcher {
 	tokens: string[];
 	spaces: string[];
 	constructor(text: string) {
+		this.updateScript(text);
+	}
+
+	updateScript(text: string) {
 		this.originalText = text;
 		const [tokens, spaces] = text.unzip();
 		this.tokens = tokens.map(t => t.toLowerCase());
