@@ -111,6 +111,29 @@ describe(input, () => {
     }
 });
 
+input = `“I have detected,” he said, “disturbances in the wash.”
+“The wash?” said Arthur.
+“The space-time wash,” said Ford.
+Arthur nodded, and then cleared his throat.
+“Are we talking about,” he asked cautiously, “some sort of Vogon laundromat, or what are we talking about?”
+“Eddies,” said Ford, “in the space-time continuum.”
+“Ah,” nodded Arthur, “is he? Is he?” He pushed his hands into the pocket of his dressing gown and looked knowledgeably into the distance.
+“What?” said Ford.
+“Er, who,” said Arthur, “is Eddy, then, exactly?”
+Ford looked angrily at him.
+“Will you listen?” he snapped.
+“I have been listening,” said Arthur, “but I’m not sure it’s helped.”`;
+
+describe('“I have detected,” ...', () => {
+    let matcher = new Matcher(input);
+    let cases: [string, number][] = [
+		['I have detected he said disturbances in the wash to wash their Arthur the space-time washer said Ford  Arthur nodded and then cleared his throat how he talking about he asked cautiously some sort of vogon laundromat or what are we talking about', 268]
+    ];
+    test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
+        expect(matcher.match(fragment, 25)).toBe(index);
+    });
+});
+
 input = `"Eddies," said Ford, "in the space-time continuum."
 
 "Ah," nodded Arthur, "is he? Is he?" He pushed his hands into the pocket of his dressing gown and looked knowledgeably into the distance.
@@ -123,9 +146,10 @@ describe('Eddies...', () => {
     let matcher = new Matcher(input);
     let cases: [string, number][] = [
         ['eddies', 10], // should match '"Eddies," ' including the trailing space
-        ['eddies said ford', 22 ], // should match "Eddies," said Ford, " 
+        ['eddies said ford', 22 ], // should match "Eddies," said Ford, "
         ['eddies said ford in the space time continuum ah nodded arthur', 75 ],
-        ['eddies said ford in the space time continuum ah nodded arthur is he is he he pushed', 100 ]
+        ['eddies said ford in the space time continuum ah nodded arthur is he is he he pushed', 100 ],
+        ['eddies said Ford in the space time continuum ah nodded arthur', 75 ]
     ];
     test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
         expect(matcher.match(fragment)).toBe(index);

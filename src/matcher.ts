@@ -33,10 +33,13 @@ export default class Matcher {
 		let needle = fragment.replace(/[\W]/g, '').toLowerCase();
 		let offset = 0;
 		if (scope > 0) {
-			offset = needle.length - (scope + 1);
+			offset = needle.length - (scope * 2);
 			needle = needle.slice(-scope);
 		}
+		console.log(offset,needle);
 		let position = this.haystack.indexOf(needle, offset);
+		console.log(this.haystack);
+		console.log(position);
 		if (position < 0) return position;
 
 		position += needle.length - 1;

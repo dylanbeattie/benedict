@@ -1,31 +1,38 @@
 div#toolbar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 48px;
+	background-color: #333;
+	color: #fff;
 	display: flex;
 	align-items: center;
+	justify-content: flex-start;
+	label#status {
+		padding: 16px;
+		display: block;
+		float: right;
+		color: #fff;
+		flex-grow: 1;
+		text-align: right;
+		margin-right: 8px;
+	}
 
-}
-div#toolbar button {
-	border: 1px solid #036;
-	width: 36px;
-	height: 36px;
-	overflow: clip;
-	padding: 0;
-	margin: 2px;
-	background: none;
-	color: #fff;
-	display: inline-block;
-	font-size: 120%;
-}
-div#toolbar label {
-	margin-left: 8px;
-	display: inline-block;
-}
-div#toolbar label#status {
-	flex-grow: 1;
-	text-align: right;
-	margin-right: 8px;
-}
-
-div#toolbar button:hover {
-	background-color: #036;
-	cursor: pointer;
+	button {
+		border: 1px solid #ccc;
+		width: 36px;
+		height: 36px;
+		overflow: clip;
+		padding: 0;
+		margin: 2px;
+		background: none;
+		color: #fff;
+		display: inline-block;
+		font-size: 120%;
+		&:hover {
+			background-color: #999;
+			cursor: pointer;
+		}
+	}
 }
