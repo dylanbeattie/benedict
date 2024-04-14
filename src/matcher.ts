@@ -2,10 +2,10 @@ import './strings';
 import './arrays';
 
 export default class Matcher {
-	originalText: string;
-	haystack: string;
-	tokens: string[];
-	spaces: string[];
+	originalText: string = "";
+	haystack: string = "";
+	tokens: string[] = [];
+	spaces: string[] = [];
 	constructor(text: string) {
 		this.updateScript(text);
 	}
@@ -60,7 +60,7 @@ export default class Matcher {
 			if (lastWordInFragment === targetToken) {
 				allTheThings.push(this.spaces[indexOfFinalSpace]);
 			}
-		} 
+		}
 		return allTheThings.sum(token => token.length);
 	}
 }

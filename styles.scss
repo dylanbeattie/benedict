@@ -1,3 +1,5 @@
+@import url('toolbar.scss');
+
 div#toolbar {
     position: fixed;
     top :0;
@@ -14,6 +16,9 @@ div#toolbar {
     }
 }
 div#prompter {
+	transition: transform 0.5s;
+	&.hflip { transform: rotateY(180deg); }
+	&.vflip { transform: rotateX(180deg); }
     position: fixed;
     top: 54px;
     left: 6px;
@@ -29,7 +34,7 @@ div#prompter {
         left: 0;
         right: 0;
         bottom: 0;
-        padding: 20px 200px;
+        padding: 200px;
         line-height: 1.8em;
         font-family: Lato, Arial, Helvetica, sans-serif;
         overflow-y: scroll;
@@ -40,17 +45,18 @@ div#prompter {
             color: #00f;
         }
     }
-    textarea { 
+    textarea {
         display: none;
     }
     hr {
         position: absolute;
-        border-width: 2px;
+        border-width: 0 0 4px 0;
         border-style: solid;
         border-color: #f00;
         left: 200px;
         right: 200px;
         top: 200px;
-        
+		padding-top: 10px;
+
     }
 }

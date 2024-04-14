@@ -2,20 +2,31 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vite + TS</title>
-  <link rel="stylesheet" href="styles.scss" />
+	<meta charset="UTF-8" />
+	<link rel="icon" type="image/svg+xml" href="/vite.svg" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Benedict</title>
+	<link rel="stylesheet" href="styles.scss" />
+	<link href="fontawesome/css/fontawesome.css" rel="stylesheet" />
+	<link href="fontawesome/css/all.css" rel="stylesheet" />
 </head>
+
 <body>
-  <div id="toolbar">
-    <input type="button" id="playButton" value="Go" />
-    <label id="status">Ready</label>
-  </div>
-  <div id="prompter">
-    <hr />
-    <textarea>“I have detected,” he said, “disturbances in the wash.”
+
+	<div id="toolbar">
+		<button id="smaller-text-button" style="font-size: 80%;">A</button>
+		<button id="bigger-text-button" style="font-size: 130%;">A</button>
+		<button id="h-flip-button" class="fa-solid fa-reflect-horizontal"></button>
+		<button id="v-flip-button" class="fa-solid fa-reflect-vertical"></button>
+		<button id="wider-button" class="fa-solid fa-arrows-left-right-to-line"></button>
+		<button id="narrower-button" style="transform: rotateZ(90deg);" class="fa-solid fa-arrows-to-line"></button>
+		<button id="reset-button" class="fa-solid fa-arrows-rotate"></button>
+		<button id="start-button" class="fa-solid fa-play"></button>
+		<label id="status">Ready</label>
+	</div>
+	<div id="prompter">
+		<hr />
+		<textarea>“I have detected,” he said, “disturbances in the wash.”
 “The wash?” said Arthur.
 “The space-time wash,” said Ford.
 Arthur nodded, and then cleared his throat.
@@ -27,10 +38,10 @@ Arthur nodded, and then cleared his throat.
 Ford looked angrily at him.
 “Will you listen?” he snapped.
 “I have been listening,” said Arthur, “but I’m not sure it’s helped.”</textarea>
-    <div id="playback">
-    </div>
-  </div>
-  <script type="module" src="/src/main.ts"></script>
+		<div id="playback">
+		</div>
+	</div>
+	<script type="module" src="/src/main.ts"></script>
 </body>
 
 </html>

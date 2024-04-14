@@ -1,0 +1,31 @@
+div#toolbar {
+	display: flex;
+	align-items: center;
+
+}
+div#toolbar button {
+	border: 1px solid #036;
+	width: 36px;
+	height: 36px;
+	overflow: clip;
+	padding: 0;
+	margin: 2px;
+	background: none;
+	color: #fff;
+	display: inline-block;
+	font-size: 120%;
+}
+div#toolbar label {
+	margin-left: 8px;
+	display: inline-block;
+}
+div#toolbar label#status {
+	flex-grow: 1;
+	text-align: right;
+	margin-right: 8px;
+}
+
+div#toolbar button:hover {
+	background-color: #036;
+	cursor: pointer;
+}
