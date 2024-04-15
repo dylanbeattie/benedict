@@ -1,4 +1,4 @@
-import { Prompter } from './Prompter';
+import { Prompter } from './prompter';
 
 export class Toolbar {
 	status: any;

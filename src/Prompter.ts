@@ -57,16 +57,16 @@ export class Prompter {
 		let result = Array.from(event.results).map(r => r[0].transcript).join(' ').replace(/ +/g, ' ');
 		if (this.latestResult == result) return;
 		this.latestResult = result;
-		let [ filteredSpeech, update ] = this.filterAndApplyCommands(result);
+		let [filteredSpeech, update] = this.filterAndApplyCommands(result);
 		if (update) this.updateSpeech(filteredSpeech);
 	}
 
-	filterAndApplyCommands(speech: string) : [result: string, update: boolean] {
+	filterAndApplyCommands(speech: string): [result: string, update: boolean] {
 		let update = true;
 		let lastTwoWords = speech.toLowerCase().split(' ').slice(-2);
 		if (lastTwoWords.length == 2 && lastTwoWords[0] == "benedict") {
 			update = false;
-			switch(lastTwoWords[1]) {
+			switch (lastTwoWords[1]) {
 				case "bigger": this.updateTextSize(+1); break;
 				case "smaller": this.updateTextSize(-1); break;
 				case "wider": this.pad(-1); break;
@@ -78,7 +78,7 @@ export class Prompter {
 			}
 		}
 		let filteredSpeech = speech.replace(/ benedict \w+/g, ' ').replace(/ benedict$/, '');
-		return [ filteredSpeech, update ];
+		return [filteredSpeech, update];
 	}
 
 	init() {
@@ -98,11 +98,12 @@ export class Prompter {
 	}
 
 	play() {
+		const FPS = 50;
 		this.updateScript();
 		this.started = true;
 		this.player.style.display = "block";
 		this.editor.style.display = "none";
-		this.scrollInterval = window.setInterval(this.updateScroll.bind(this), 1000 / 50);
+		this.scrollInterval = window.setInterval(this.updateScroll.bind(this), 1000 / FPS);
 	}
 
 	reset() {
@@ -118,8 +119,12 @@ export class Prompter {
 	}
 
 	flip = (className: string) => {
-		console.log(this.container.classList);
-		this.vflip = this.container.classList.toggle(className);
+		switch (className) {
+			case "vflip":
+				this.vflip = this.container.classList.toggle(className); return;
+			default:
+				this.container.classList.toggle(className); return;
+		}
 	};
 
 	moveLine(direction: number): void {
@@ -200,6 +205,7 @@ export class Prompter {
 	get #scrollDistance() {
 		let markerRect = this.marker!.getBoundingClientRect();
 		let guessRect = this.player.querySelector("span.guessed")!.getBoundingClientRect();
+		console.log(markerRect, guessRect);
 		let distance = (this.vflip ? guessRect.bottom - guessRect.height - markerRect.bottom : guessRect.top + guessRect.height - markerRect.top);
 		return (distance);
 	}
@@ -207,7 +213,7 @@ export class Prompter {
 	updateScroll() {
 		if (Math.abs(this.#scrollDistance) > 2) {
 			let log = Math.log(Math.abs(this.#scrollDistance));
-			let scroll = Math.pow(log, 2)/2;
+			let scroll = Math.pow(log, 2) / 2;
 			let sign = Math.sign(this.#scrollDistance) * (this.vflip ? -1 : +1);
 			this.player.scrollTop += sign * scroll;
 		}
