@@ -1,4 +1,4 @@
-import { Toolbar } from './Toolbar';
+import { Toolbar } from './toolbar';
 import Matcher from './matcher';
 import { fontSizes } from './main';
 

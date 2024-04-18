@@ -1,8 +1,25 @@
 @import url('toolbar.scss');
 
+/* open-sans-regular - latin */
+@font-face {
+	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 400;
+	src: url('fonts/open-sans-v40-latin-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  }
+  /* open-sans-500 - latin */
+  @font-face {
+	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 500;
+	src: url('fonts/open-sans-v40-latin-500.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  }
+
 html,
 textarea {
-	font-family: Lato, Arial, Helvetica, sans-serif;
+	font-family: "Open Sans", Arial, Helvetica, sans-serif;
 	background-color: #000;
 	color: #fff;
 }
@@ -36,7 +53,6 @@ div#prompter {
 		bottom: 0;
 		/* padding: 1000px 200px; */
 		line-height: 1.8em;
-		font-family: Lato, Arial, Helvetica, sans-serif;
 		overflow-y: scroll;
 
 		span.matched {
