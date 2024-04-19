@@ -1,7 +1,6 @@
-import { Prompter } from './prompter';
-import { Toolbar } from './toolbar';
+import Prompter from './prompter';
+import Toolbar from './toolbar';
 
-export const fontSizes = ["32px", "48px", "64px", "80px", "96px", "128px", "144px", "192px"];
 var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 var speech = new SpeechRecognition();
 speech.continuous = true;

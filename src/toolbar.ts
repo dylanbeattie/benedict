@@ -1,8 +1,8 @@
-import { Prompter } from './prompter';
+import Prompter from './prompter';
 
-export class Toolbar {
+export default class Toolbar {
 	status: any;
-	prompter: Prompter;
+	prompter!: Prompter;
 	constructor(container: HTMLElement) {
 		this.status = container.querySelector("label#status");
 

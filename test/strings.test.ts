@@ -7,7 +7,7 @@ describe('lastWord() of ', () => {
 		['No way...', 'way'],
 		['', ''],
 	];
-	test.each(cases)('%p is %p', (text: string, word: string) {
+	test.each(cases)('%p is %p', (text: string, word: string) => {
 		expect(text.lastWord()).toBe(word);
 	});
 })
@@ -16,7 +16,7 @@ describe('unzip', () => {
 		'abc': [['abc'], ['']],
 		'a b c': [['a', 'b', 'c'], [' ', ' ', '']],
 		'a! b... c?': [['a', 'b', 'c'], ['! ', '... ', '?']],
-		'...a.b.c...': [['', 'a', 'b', 'c'], ['...', '.', '.', '...']]
+		'...a.b.c...': [['', 'a', 'b', 'c'], ['...', '.', '.', '...']],
 		'\na\rb\tc': [['', 'a', 'b', 'c'], ['\n', '\r', '\t', '']],
 		'a': [['a'], ['']]
 	};

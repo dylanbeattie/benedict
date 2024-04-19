@@ -1,6 +1,7 @@
-import { Toolbar } from './toolbar';
+import Toolbar from './toolbar';
 import Matcher from './matcher';
-import { fontSizes } from './main';
+
+const fontSizes = ["32px", "48px", "64px", "80px", "96px", "128px", "144px", "192px"];
 
 function position(el: HTMLElement) {
 	const { top, left } = el.getBoundingClientRect();
@@ -10,7 +11,8 @@ function position(el: HTMLElement) {
 		left: left - parseInt(marginLeft, 10)
 	};
 }
-export class Prompter {
+
+export default class Prompter {
 	editor: HTMLTextAreaElement;
 	player: HTMLDivElement;
 	matcher: Matcher;
@@ -55,18 +57,23 @@ export class Prompter {
 
 	onresult(event: { results: SpeechRecognitionResultList }) {
 		let result = Array.from(event.results).map(r => r[0].transcript).join(' ').replace(/ +/g, ' ');
-		if (this.latestResult == result) return;
-		this.latestResult = result;
-		let [filteredSpeech, update] = this.filterAndApplyCommands(result);
-		if (update) this.updateSpeech(filteredSpeech);
+		var hasSpeechActuallyChanged = this.latestResult != result;
+		if (hasSpeechActuallyChanged) {
+			this.latestResult = result;
+			let [filteredSpeech, update] = this.filterAndApplyCommands(result);
+			if (update) this.updateSpeech(filteredSpeech);
+		}
 	}
 
 	filterAndApplyCommands(speech: string): [result: string, update: boolean] {
 		let update = true;
 		let lastTwoWords = speech.toLowerCase().split(' ').slice(-2);
-		if (lastTwoWords.length == 2 && lastTwoWords[0] == "benedict") {
+		if (lastTwoWords.length == 2 && lastTwoWords.includes("benedict")) {
 			update = false;
 			switch (lastTwoWords[1]) {
+				case "ben":
+				case "bened":
+				case "benedict": break;
 				case "bigger": this.updateTextSize(+1); break;
 				case "smaller": this.updateTextSize(-1); break;
 				case "wider": this.pad(-1); break;
@@ -75,6 +82,8 @@ export class Prompter {
 				case "down": this.moveLine(+1); break;
 				case "reset": this.reset(); break;
 				case "go": this.reset(); this.play(); break;
+				case "flip": this.flip("vflip"); break;
+				case "mirror": this.flip("hflip"); break;
 			}
 		}
 		let filteredSpeech = speech.replace(/ benedict \w+/g, ' ').replace(/ benedict$/, '');

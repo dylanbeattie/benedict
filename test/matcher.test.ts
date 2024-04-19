@@ -108,7 +108,7 @@ describe(input, () => {
         test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
             expect(matcher.match(fragment)).toBe(index);
         });
-    }
+    });
 });
 
 input = `“I have detected,” he said, “disturbances in the wash.”
