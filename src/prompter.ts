@@ -101,7 +101,7 @@ export default class Prompter {
 		this.started = false;
 		this.player.style.display = "none";
 		this.editor.style.display = "block";
-		this.editor.value = this.player.innerText;
+		this.editor.value = this.player.innerText.trim();
 		this.editor.selectionStart = this.position + this.guessSize;
 		this.editor.focus();
 	}
@@ -109,6 +109,7 @@ export default class Prompter {
 	play() {
 		const FPS = 50;
 		this.updateScript();
+		this.updateSpeech('');
 		this.started = true;
 		this.player.style.display = "block";
 		this.editor.style.display = "none";
