@@ -1,5 +1,6 @@
 import Toolbar from './toolbar';
 import Matcher from './matcher';
+import { getCookie, setCookie } from './cookies';
 
 const fontSizes = ["32px", "48px", "64px", "80px", "96px", "128px", "144px", "192px"];
 
@@ -116,6 +117,7 @@ export default class Prompter {
 
 	init() {
 		this.pad(0);
+		this.updateTextSize(0);
 		this.updateScript();
 		this.updateSpeech();
 	}
@@ -151,8 +153,8 @@ export default class Prompter {
 			window.setTimeout((() => {
 				this.container.classList.remove("reset-flash");
 				this.speech.start()
-			}).bind(this), 500);
-		}).bind(this), 500);
+			}).bind(this), 200);
+		}).bind(this), 200);
 	}
 
 	flip = (className: string) => {
@@ -177,7 +179,7 @@ export default class Prompter {
 
 	pad(direction = 0) {
 		const SCROLLBAR_WIDTH = 16;
-		let padding = 200;
+		let padding = parseInt(getCookie("benedict-padding")!) ?? 200;
 		if (direction !== 0) {
 			padding = parseInt(window.getComputedStyle(this.player).paddingLeft)
 				||
@@ -191,6 +193,7 @@ export default class Prompter {
 			padding += (direction * 100);
 			padding = Math.min(upperLimit, Math.max(lowerLimit, padding));
 		}
+		setCookie("benedict-padding", padding.toString());
 		this.editor.style.paddingLeft = padding + SCROLLBAR_WIDTH + "px";
 		this.editor.style.paddingRight = padding + "px";
 		this.player.style.paddingLeft = padding + "px";
@@ -207,13 +210,17 @@ export default class Prompter {
 
 
 	updateTextSize(offset = 0) {
-		var fontSize = window.getComputedStyle(this.player).fontSize;
-		var index = fontSizes.indexOf(fontSize);
-		if (index < 0) index = 3;
-		index += offset;
-		if (index < 0) index = 0;
-		if (index >= fontSizes.length) index = fontSizes.length - 1;
-		var size = fontSizes[index];
+		var fontSizeIndex = parseInt(getCookie("benedict-fontSizeIndex")!);
+		if (isNaN(fontSizeIndex)) {
+			var fontSize = window.getComputedStyle(this.player).fontSize;
+			fontSizeIndex = fontSizes.indexOf(fontSize);
+		}
+		if (fontSizeIndex < 0) fontSizeIndex = 3;
+		fontSizeIndex += offset;
+		if (fontSizeIndex < 0) fontSizeIndex = 0;
+		if (fontSizeIndex >= fontSizes.length) fontSizeIndex = fontSizes.length - 1;
+		setCookie("benedict-fontSizeIndex", fontSizeIndex.toString());
+		var size = fontSizes[fontSizeIndex];
 		this.player.style.fontSize = size;
 		this.editor.style.fontSize = size;
 		this.updateScroll();
