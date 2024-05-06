@@ -2,20 +2,25 @@
 
 /* open-sans-regular - latin */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	font-display: swap;
+	/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
 	font-family: 'Open Sans';
 	font-style: normal;
 	font-weight: 400;
-	src: url('fonts/open-sans-v40-latin-regular.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
-  }
-  /* open-sans-500 - latin */
-  @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+	src: url('fonts/open-sans-v40-latin-regular.woff2') format('woff2');
+	/* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+
+/* open-sans-500 - latin */
+@font-face {
+	font-display: swap;
+	/* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
 	font-family: 'Open Sans';
 	font-style: normal;
 	font-weight: 500;
-	src: url('fonts/open-sans-v40-cyrillic_greek_latin_latin-ext-500.woff2') format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
-  }
+	src: url('fonts/open-sans-v40-cyrillic_greek_latin_latin-ext-500.woff2') format('woff2');
+	/* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
 
 html,
 textarea {
@@ -25,7 +30,19 @@ textarea {
 }
 
 div#prompter {
-	transition: transform 0.5s;
+	&.reset-flash {
+		background-color: #fff;
+	}
+
+	&.speech-error {
+		background-color: #f00;
+	}
+	&.speech-ended {
+		background-color: #909;
+	}
+
+	transition: background-color 0.5s ease,
+	transform 0.5s;
 
 	&.hflip {
 		transform: rotateY(180deg);
@@ -61,8 +78,14 @@ div#prompter {
 		}
 
 		span.guessed {
-			color: #ccc;
+			color: #ff0;
 			// outline: 1px dashed #00f;
+		}
+		span.lookahead {
+			color: #fff;
+		}
+		span.remainder {
+			color: #999;
 		}
 	}
 

@@ -12,12 +12,15 @@ function position(el: HTMLElement) {
 	};
 }
 
+const FPS = 50;
+
 export default class Prompter {
 	editor: HTMLTextAreaElement;
 	player: HTMLDivElement;
 	matcher: Matcher;
 	position: number = 0;
 	guessSize: number = 0;
+	lookahead: number = 100; // how many characters ahead of the current position should we look when deciding if a match is valid?
 	toolbar: Toolbar;
 	marker: HTMLHRElement;
 	markerTop: number = 0;
@@ -43,11 +46,32 @@ export default class Prompter {
 		speech.onspeechstart = this.onspeechstart.bind(this);
 		speech.onnomatch = console.log;
 		speech.onerror = (error: any) => {
-			console.log(error);
+			if (error.error == 'aborted') return;
+			container.classList.add("speech-error");
+			console.error("speech.onerror", error);
 			speech.abort();
-			window.setTimeout(() => speech.start(), 100);
+			window.setTimeout(() => {
+				try {
+					speech.start();
+				} catch (error) {
+					console.log(error);
+				}
+				container.classList.remove("speech-error");
+			}, 200);
 		}
 		speech.onresult = this.onresult.bind(this);
+		speech.onend = (event: any) => {
+			console.log("speech.onend", event);
+			container.classList.add("speech-ended");
+			window.setTimeout(() => {
+				try {
+					speech.start();
+				} catch (error) {
+					console.log(error);
+				}
+				container.classList.remove("speech-ended");
+			}, 200);
+		}
 		speech.start();
 	}
 
@@ -107,7 +131,6 @@ export default class Prompter {
 	}
 
 	play() {
-		const FPS = 50;
 		this.updateScript();
 		this.updateSpeech('');
 		this.started = true;
@@ -117,6 +140,7 @@ export default class Prompter {
 	}
 
 	reset() {
+		this.container.classList.add("reset-flash");
 		this.speech.abort();
 		window.setTimeout((() => {
 			this.position = 0;
@@ -124,8 +148,11 @@ export default class Prompter {
 			this.updateScript();
 			this.updateSpeech('');
 			this.updateScroll();
-			this.speech.start();
-		}).bind(this), 100);
+			window.setTimeout((() => {
+				this.container.classList.remove("reset-flash");
+				this.speech.start()
+			}).bind(this), 500);
+		}).bind(this), 500);
 	}
 
 	flip = (className: string) => {
@@ -194,11 +221,11 @@ export default class Prompter {
 
 	updateSpeech(speech: string = ''): void {
 		var script = this.matcher.originalText;
-		console.log(script);
-		console.log(speech);
 		var index = this.matcher.match(speech, 20);
 		this.toolbar.updateStatus(speech.slice(-50));
-		if (index >= this.position) {
+		let hasAdvanced = index >= this.position;
+		let goneRunaway = index > (this.position + this.guessSize + this.lookahead);
+		if (hasAdvanced && !goneRunaway) {
 			this.position = index;
 			this.guessSize = 0;
 		} else {
@@ -206,24 +233,30 @@ export default class Prompter {
 		}
 		var matched = script.substring(0, this.position);
 		var guessed = script.substring(this.position, this.position + this.guessSize);
-		var remainder = script.substring(this.position + this.guessSize);
+		var lookaheadIndex = this.position + this.guessSize + this.lookahead;
+		while (script[lookaheadIndex] != ' ') lookaheadIndex++;
+		var lookahead = script.substring(this.position + this.guessSize, lookaheadIndex)
+		var remainder = script.substring(lookaheadIndex);
 		const PADDING = '\n\n\n\n\n\n\n\n\n\n';
-		let html = `${PADDING}<span class="matched">${matched}</span><span class="guessed">${guessed}</span>${remainder}${PADDING}`;
+		let html = `${PADDING}<span class="matched">${matched}</span>`
+			+ `<span class="guessed">${guessed}</span>`
+			+ `<span class="lookahead">${lookahead}</span>`
+			+ `<span class="remainder">${remainder}</span>${PADDING}`;
 		this.player.innerHTML = html.replace(/\n/g, '<br />\n');
 	}
 
 	get #scrollDistance() {
 		let markerRect = this.marker!.getBoundingClientRect();
 		let guessRect = this.player.querySelector("span.guessed")!.getBoundingClientRect();
-		console.log(markerRect, guessRect);
 		let distance = (this.vflip ? guessRect.bottom - guessRect.height - markerRect.bottom : guessRect.top + guessRect.height - markerRect.top);
 		return (distance);
 	}
 
 	updateScroll() {
-		if (Math.abs(this.#scrollDistance) > 2) {
+		let absDistance = Math.abs(this.#scrollDistance);
+		if (absDistance > 2) {
 			let log = Math.log(Math.abs(this.#scrollDistance));
-			let scroll = Math.pow(log, 2) / 2;
+			let scroll = (absDistance > 500 ? absDistance / 2 : (Math.pow(log, 2) / 2));
 			let sign = Math.sign(this.#scrollDistance) * (this.vflip ? -1 : +1);
 			this.player.scrollTop += sign * scroll;
 		}
