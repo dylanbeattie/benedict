@@ -37,6 +37,7 @@ div#prompter {
 	&.speech-error {
 		background-color: #f00;
 	}
+
 	&.speech-ended {
 		// background-color: #909;
 	}
@@ -73,20 +74,20 @@ div#prompter {
 		overflow-y: scroll;
 
 		span.matched {
-			 // what colour is the text we've already definitely matched?
-			color: #666;
-
+			// what colour is the text we've already definitely matched?
+			color: #ff0;
 		}
 
 		span.guessed {
-			 // what colour is the text we've guessed because we detected speech but haven't matched it yet?
-			color: #ff0;
-
+			// what colour is the text we've guessed because we detected speech but haven't matched it yet?
+			color: #ff9;
 		}
+
 		span.lookahead {
 			// What colour is the text we're considering when trying to find a match?
 			color: #fff;
 		}
+
 		span.remainder {
 			// What colour is the text we're not looking at yet?
 			color: #fff;
