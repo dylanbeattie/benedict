@@ -43,7 +43,7 @@ export default class Prompter {
 		this.speechStatusElement = container.querySelector("div#speech-status")!;
 		this.markerTop = position(this.marker).top;
 		this.matcher = new Matcher(this.editor.value);
-		this.editor.addEventListener("change", this.updateScript.bind(this));
+		this.editor.addEventListener("change", this.editorChange.bind(this));
 		this.player.addEventListener("click", this.edit.bind(this));
 		this.toolbar = toolbar;
 		this.toolbar.prompter = this;
@@ -208,6 +208,10 @@ export default class Prompter {
 		this.player.style.paddingRight = padding + "px";
 		this.marker.style.left = padding + "px";
 		this.marker.style.right = padding + "px";
+	}
+
+	editorChange(event: Event) {
+		this.updateScript(this.editor.value);
 	}
 
 	updateScript(script: string | null = null): void {
