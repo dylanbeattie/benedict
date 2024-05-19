@@ -59,6 +59,23 @@ div#prompter {
 	right:6px;
 	bottom: 6px;
 	padding: 4px;
+	div#script-status, div#speech-status {
+		position: absolute;
+		left: 0;
+		right: 0;
+		height: 16px;
+		padding: 4px;
+		background-color: #000;
+		color: #fff;
+		font-size: 10px;
+		font-family: monospace;
+	}
+	div#script-status {
+		bottom: 16px;
+	}
+	div#speech-status {
+		bottom: 0;
+	}
 
 	textarea,
 	div#playback {
@@ -68,7 +85,7 @@ div#prompter {
 		top: 0;
 		left: 0;
 		right: 0;
-		bottom: 0;
+		bottom: 32px;
 		/* padding: 1000px 200px; */
 		line-height: 1.8em;
 		overflow-y: scroll;

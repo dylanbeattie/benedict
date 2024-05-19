@@ -18,6 +18,8 @@ const FPS = 50;
 export default class Prompter {
 	editor: HTMLTextAreaElement;
 	player: HTMLDivElement;
+	speechStatusElement: HTMLDivElement;
+	scriptStatusElement: HTMLDivElement;
 	matcher: Matcher;
 	position: number = 0;
 	guessSize: number = 0;
@@ -37,6 +39,8 @@ export default class Prompter {
 		this.player = container.querySelector("div#playback")!;
 		this.editor = container.querySelector("textarea")!;
 		this.marker = container.querySelector("hr")!;
+		this.scriptStatusElement = container.querySelector("div#script-status")!;
+		this.speechStatusElement = container.querySelector("div#speech-status")!;
 		this.markerTop = position(this.marker).top;
 		this.matcher = new Matcher(this.editor.value);
 		this.editor.addEventListener("change", this.updateScript.bind(this));
@@ -48,6 +52,7 @@ export default class Prompter {
 		speech.onnomatch = console.log;
 		speech.onerror = (error: any) => {
 			if (error.error == 'aborted') return;
+			if (error.error == 'no-speech') return;
 			container.classList.add("speech-error");
 			console.error("speech.onerror", error);
 			speech.abort();
@@ -64,6 +69,7 @@ export default class Prompter {
 		speech.onend = (event: any) => {
 			console.log("speech.onend", event);
 			container.classList.add("speech-ended");
+			speech.abort();
 			window.setTimeout(() => {
 				try {
 					speech.start();
@@ -116,9 +122,10 @@ export default class Prompter {
 	}
 
 	init() {
+		let storedScript = localStorage.getItem("benedict-script");
 		this.pad(0);
 		this.updateTextSize(0);
-		this.updateScript();
+		this.updateScript(storedScript);
 		this.updateSpeech();
 	}
 
@@ -135,6 +142,7 @@ export default class Prompter {
 	play() {
 		this.updateScript();
 		this.updateSpeech('');
+		localStorage.setItem("benedict-script", this.editor.value);
 		this.started = true;
 		this.player.style.display = "block";
 		this.editor.style.display = "none";
@@ -202,7 +210,8 @@ export default class Prompter {
 		this.marker.style.right = padding + "px";
 	}
 
-	updateScript(): void {
+	updateScript(script: string | null = null): void {
+		if (script != null) this.editor.value = script;
 		this.position = 0;
 		this.guessSize = 0;
 		this.matcher.updateScript(this.editor.value);
@@ -227,8 +236,15 @@ export default class Prompter {
 	}
 
 	updateSpeech(speech: string = ''): void {
-		var script = this.matcher.originalText;
-		var index = this.matcher.match(speech, 20);
+		const WINDOW_SIZE = 50;
+		var script = this.matcher.fancyText;
+		var needle = speech.slice(-20);
+
+		var index = this.matcher.match(needle, this.position, WINDOW_SIZE + this.guessSize);
+
+		this.scriptStatusElement.innerText = `haystack: ${this.matcher.haystack}`;
+		this.speechStatusElement.innerText = `needle: ${needle} position: ${this.position}, guessSize: ${this.guessSize}`;
+
 		this.toolbar.updateStatus(speech.slice(-50));
 		let hasAdvanced = index >= this.position;
 		let goneRunaway = index > (this.position + this.guessSize + this.lookahead);
@@ -236,7 +252,7 @@ export default class Prompter {
 			this.position = index;
 			this.guessSize = 0;
 		} else {
-			this.guessSize += 3;
+			this.guessSize += 4;
 		}
 		var matched = script.substring(0, this.position);
 		var guessed = script.substring(this.position, this.position + this.guessSize);
@@ -254,16 +270,16 @@ export default class Prompter {
 
 	get #scrollDistance() {
 		let markerRect = this.marker!.getBoundingClientRect();
-		let guessRect = this.player.querySelector("span.guessed")!.getBoundingClientRect();
+		let guessRect = this.player.querySelector("span.guessed")?.getBoundingClientRect()
+			?? { height: 0, top: 0, bottom: 0 };
 		let distance = (this.vflip ? guessRect.bottom - guessRect.height - markerRect.bottom : guessRect.top + guessRect.height - markerRect.top);
 		return (distance);
 	}
 
 	updateScroll() {
 		let absDistance = Math.abs(this.#scrollDistance);
-		if (absDistance > 2) {
-			let log = Math.log(Math.abs(this.#scrollDistance));
-			let scroll = (absDistance > 500 ? absDistance / 2 : (Math.pow(log, 2) / 2));
+		if (absDistance > 1) {
+			let scroll = (absDistance > 500 ? absDistance / 2 : absDistance / 10);
 			let sign = Math.sign(this.#scrollDistance) * (this.vflip ? -1 : +1);
 			this.player.scrollTop += sign * scroll;
 		}

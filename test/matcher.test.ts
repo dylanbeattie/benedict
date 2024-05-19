@@ -9,7 +9,7 @@ describe('abc def ghi', () => {
         ['abc d', 5]
     ];
     test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
-        expect(matcher.match(fragment)).toBe(index);
+        expect(matcher.match(fragment, 0, 5)).toBe(index);
     });
 });
 describe('when text starts with non-word characters', () => {
@@ -20,7 +20,7 @@ describe('when text starts with non-word characters', () => {
     ];
     test.each(cases)('Matcher(%p).match(%p) == %p', (text: string, fragment: string, expected: number) => {
         let matcher = new Matcher(text);
-        expect(matcher.match(fragment)).toBe(expected);
+        expect(matcher.match(fragment, 0, 20)).toBe(expected);
     })
 })
 
@@ -34,34 +34,38 @@ describe(input, () => {
             ["don't make o'bri", 16],
         ];
         test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
-            expect(matcher.match(fragment)).toBe(index);
+            expect(matcher.match(fragment, 0, 20)).toBe(index);
         });
     });
 });
-
-describe('match using window size', () => {
-    var matcher = new Matcher('xxxxx apple banjo');
-    let cases: [string,number,number][] = [
-        ['aaaaa apple', 5, 12],
-        ['aaaaa appal ban', 5, -1],
-        ['aaaaa appal banjo', 5, 17]
-    ];
-    test.each(cases)('%p %p %p', (fragment , scope, expected) => {
-        expect(matcher.match(fragment, scope)).toBe(expected);
-    });
-});
-
+describe('when fragment is found in fancy text', () => {
+	let input = "a-b-c-d-e";
+	let matcher = new Matcher(input);
+	let cases: [string, number][] = [
+		['a', 0],
+		['b', 1],
+		['abc', 0],
+		['cde', 2],
+		['abcde', 0],
+		['de', 3]
+	];
+	test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
+		expect(matcher.findPlainIndex(fragment, 0, 10)).toBe(index);
+	});
+})
 
 describe('match using window size with punctuation', () => {
     var matcher = new Matcher('"Bear-faced chic!" will probably be misinterpreted');
-    let cases: [string,number,number][] = [
-        // ['bare faced cheek will', 20, -1],
-        // ['bare faced cheek will probably be', 10, 36],
-        // ['bare-faced cheek will probably be', 10, 36],
-        ['bare faced cheek will probably be misint', 20, 42]
+    let cases: [string,number,number,number][] = [
+        ['bare faced cheek will', 0, 20, -1],
+        ['faced cheek will probably be', 0, 10, -1],
+        ['will probably be', 0, 50, 36],
+        ['probably be misint', 0, 60, 42],
+        ['probably be misint', 20, 40, 42],
+        ['probably be misint', 20, 25, 42]
     ];
-    test.each(cases)('%p %p %p', (fragment , scope, expected) => {
-        expect(matcher.match(fragment, scope)).toBe(expected);
+    test.each(cases)('%p %p %p %p', (speech, position, scope, expected) => {
+        expect(matcher.match(speech, position, scope)).toBe(expected);
     });
 });
 input = 'ABC def GHI';
@@ -75,7 +79,7 @@ describe(input, () => {
             // ['!', -1],
         ];
         test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
-            expect(matcher.match(fragment)).toBe(index);
+            expect(matcher.match(fragment, 0, 0)).toBe(index);
         });
     });
     describe('when fragment matches complete tokens', () => {
@@ -85,7 +89,7 @@ describe(input, () => {
             ['abc def', 8],
         ];
         test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
-            expect(matcher.match(fragment)).toBe(index);
+            expect(matcher.match(fragment, 0, 10)).toBe(index);
         });
 
     });
@@ -97,7 +101,7 @@ describe(input, () => {
             ['abc de', 6],
         ];
         test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
-            expect(matcher.match(fragment)).toBe(index);
+            expect(matcher.match(fragment, 0, 10)).toBe(index);
         });
     });
     describe('when fragment matches multiple tokens', () => {
@@ -106,7 +110,7 @@ describe(input, () => {
             ['abcdefg', 9],
         ];
         test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
-            expect(matcher.match(fragment)).toBe(index);
+            expect(matcher.match(fragment, 0, 10)).toBe(index);
         });
     });
 });
@@ -127,10 +131,10 @@ Ford looked angrily at him.
 describe('“I have detected,” ...', () => {
     let matcher = new Matcher(input);
     let cases: [string, number][] = [
-		['I have detected he said disturbances in the wash to wash their Arthur the space-time washer said Ford  Arthur nodded and then cleared his throat how he talking about he asked cautiously some sort of vogon laundromat or what are we talking about', 268]
+		['or what are we talking about', 268]
     ];
-    test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
-        expect(matcher.match(fragment, 25)).toBe(index);
+    test.each(cases)('matches %p at %p', (speech: string, index: number) => {
+        expect(matcher.match(speech, 240, 40)).toBe(index);
     });
 });
 
@@ -152,7 +156,7 @@ describe('Eddies...', () => {
         ['eddies said Ford in the space time continuum ah nodded arthur', 75 ]
     ];
     test.each(cases)('matches %p at %p', (fragment: string, index: number) => {
-        expect(matcher.match(fragment)).toBe(index);
+        expect(matcher.match(fragment, 0, 200)).toBe(index);
     });
 });
 
