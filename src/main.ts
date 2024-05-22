@@ -1,15 +1,18 @@
 import Prompter from './prompter';
 import Toolbar from './toolbar';
 
-var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-var speech = new SpeechRecognition();
-speech.continuous = true;
-speech.lang = 'en-US';
-speech.interimResults = true;
-speech.maxAlternatives = 1;
+function createSpeech() {
+	var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+	var speech = new SpeechRecognition();
+	speech.continuous = true;
+	speech.lang = 'en-US';
+	speech.interimResults = true;
+	speech.maxAlternatives = 1;
+	return speech;
+}
 
 var toolbar = new Toolbar(document.querySelector("#toolbar")!);
-var prompter = new Prompter(document.querySelector("#prompter")!, toolbar, speech);
+var prompter = new Prompter(document.querySelector("#prompter")!, toolbar, createSpeech);
 prompter.init();
 prompter.play();
 

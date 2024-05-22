@@ -15,5 +15,8 @@
 		"ts-jest": "^29.1.2",
 		"typescript": "^5.4.4",
 		"vite": "^5.2.0"
+	},
+	"dependencies": {
+		"@types/dom-speech-recognition": "^0.0.4"
 	}
 }

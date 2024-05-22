@@ -39,10 +39,10 @@ div#prompter {
 	}
 
 	&.speech-ended {
-		// background-color: #909;
+		background-color: #909;
 	}
 
-	transition: background-color 0.5s ease,
+	transition: background-color 0.25s ease,
 	transform 0.5s;
 
 	&.hflip {

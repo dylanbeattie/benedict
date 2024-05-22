@@ -15,6 +15,16 @@ function position(el: HTMLElement) {
 
 const FPS = 50;
 
+// How long do we recognise speech for before we start looking for a restart?
+const RESTART_AFTER_SPEECH_MS = 60000;
+// When we're looking for a restart, how long does the pause need to be to trigger one?
+const RESTART_PAUSE_LENGTH_MS = 1000;
+// OK, the listen process:
+// We start listening immediately, with a 30-second reset loop.
+// After 30 seconds, we go into a 1-second delay loop
+// if we don't get any audio for 1 second, we stop speech, destroy it,
+// create a new one, and start the 30-second loop again.
+
 export default class Prompter {
 	editor: HTMLTextAreaElement;
 	player: HTMLDivElement;
@@ -29,12 +39,13 @@ export default class Prompter {
 	markerTop: number = 0;
 	container: HTMLElement;
 	vflip: boolean = false;
-	speech: any;
 	started: boolean = false;
 	scrollInterval!: number;
 	latestResult: string = '';
+	speech: SpeechRecognition;
+	createSpeech: () => SpeechRecognition;
 
-	constructor(container: HTMLElement, toolbar: Toolbar, speech: any) {
+	constructor(container: HTMLElement, toolbar: Toolbar, createSpeech: () => SpeechRecognition) {
 		this.container = container;
 		this.player = container.querySelector("div#playback")!;
 		this.editor = container.querySelector("textarea")!;
@@ -47,46 +58,81 @@ export default class Prompter {
 		this.player.addEventListener("click", this.edit.bind(this));
 		this.toolbar = toolbar;
 		this.toolbar.prompter = this;
-		this.speech = speech;
-		speech.onspeechstart = this.onspeechstart.bind(this);
-		speech.onnomatch = console.log;
-		speech.onerror = (error: any) => {
-			if (error.error == 'aborted') return;
-			if (error.error == 'no-speech') return;
-			container.classList.add("speech-error");
-			console.error("speech.onerror", error);
-			speech.abort();
-			window.setTimeout(() => {
-				try {
-					speech.start();
-				} catch (error) {
-					console.log(error);
-				}
-				container.classList.remove("speech-error");
-			}, 200);
-		}
-		speech.onresult = this.onresult.bind(this);
-		speech.onend = (event: any) => {
-			console.log("speech.onend", event);
-			container.classList.add("speech-ended");
-			speech.abort();
-			window.setTimeout(() => {
-				try {
-					speech.start();
-				} catch (error) {
-					console.log(error);
-				}
-				container.classList.remove("speech-ended");
-			}, 200);
-		}
-		speech.start();
+		this.createSpeech = createSpeech;
+		this.startSpeechRecognition();
 	}
+
+	restartTimeout: number = 0;
+
+	startSpeechRecognition() {
+		this.speech = this.createSpeech();
+		this.speech.onspeechstart = this.onspeechstart.bind(this);
+		this.speech.onnomatch = console.log;
+		this.speech.onerror = this.speech_onerror.bind(this);
+		this.speech.onresult = this.onresult.bind(this);
+		this.speech.onspeechend = (event: any) => console.log("speech.onspeechend");
+		this.speech.onsoundend = (event: any) => console.log("speech.onsoundend");
+		this.speech.onend = this.speech_onend.bind(this);
+		this.speech.start();
+		this.restartTimeout = 0;
+		window.setTimeout(() => {
+			this.restartTimeout = window.setTimeout(this.restartSpeechRecognition.bind(this), RESTART_PAUSE_LENGTH_MS);
+		}, RESTART_AFTER_SPEECH_MS)
+	}
+
+	restartSpeechRecognition() {
+		window.clearTimeout(this.restartTimeout);
+		this.restartTimeout = 0;
+		this.resultsSinceWeShouldHaveRestarted = 0;
+		this.speech.abort();
+		this.startSpeechRecognition();
+		this.container.style.backgroundColor = "";
+	};
+
+	speech_onend(event: any) {
+		console.log("speech.onend", event);
+		let container = this.container;
+		container.classList.add("speech-ended");
+		this.speech.abort();
+		this.speech = this.createSpeech();
+		window.setTimeout(() => {
+			try {
+				this.speech.start();
+			} catch (error) {
+				console.log(error);
+			}
+			container.classList.remove("speech-ended");
+		}, 200);
+	};
+
+	speech_onerror(error: any) {
+		this.container.classList.add("speech-error");
+		console.error("speech.onerror", error);
+		this.speech.abort();
+		window.setTimeout(() => {
+			try {
+				this.speech.start();
+			} catch (error) {
+				console.log(error);
+			}
+			this.container.classList.remove("speech-error");
+		}, 200);
+	};
+
 
 	onspeechstart() {
 		console.log('speech started!');
 	}
 
+	resultsSinceWeShouldHaveRestarted: number = 0;
+
 	onresult(event: { results: SpeechRecognitionResultList }) {
+		if (this.restartTimeout) {
+			this.resultsSinceWeShouldHaveRestarted = Math.min(this.resultsSinceWeShouldHaveRestarted + 5, 255);
+			window.clearTimeout(this.restartTimeout);
+			this.restartTimeout = window.setTimeout(this.restartSpeechRecognition.bind(this), RESTART_PAUSE_LENGTH_MS);
+			this.container.style.backgroundColor = "#" + ("000000" + (this.resultsSinceWeShouldHaveRestarted * 0x10000).toString(16)).slice(-6);
+		}
 		let result = Array.from(event.results).map(r => r[0].transcript).join(' ').replace(/ +/g, ' ');
 		var hasSpeechActuallyChanged = this.latestResult != result;
 		if (hasSpeechActuallyChanged) {
@@ -261,7 +307,7 @@ export default class Prompter {
 		var matched = script.substring(0, this.position);
 		var guessed = script.substring(this.position, this.position + this.guessSize);
 		var lookaheadIndex = this.position + this.guessSize + this.lookahead;
-		while (script[lookaheadIndex] != ' ') lookaheadIndex++;
+		while (lookaheadIndex < script.length && script[lookaheadIndex] != ' ') lookaheadIndex++;
 		var lookahead = script.substring(this.position + this.guessSize, lookaheadIndex)
 		var remainder = script.substring(lookaheadIndex);
 		const PADDING = '\n\n\n\n\n\n\n\n\n\n';
