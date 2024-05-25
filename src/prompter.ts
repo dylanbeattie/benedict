@@ -29,12 +29,11 @@ export default class Prompter {
 	markerTop: number = 0;
 	container: HTMLElement;
 	vflip: boolean = false;
-	speech: any;
+	recog: any;
 	started: boolean = false;
 	scrollInterval!: number;
-	latestResult: string = '';
 
-	constructor(container: HTMLElement, toolbar: Toolbar, speech: any) {
+	constructor(container: HTMLElement, toolbar: Toolbar, recog: any) {
 		this.container = container;
 		this.player = container.querySelector("div#playback")!;
 		this.editor = container.querySelector("textarea")!;
@@ -47,78 +46,111 @@ export default class Prompter {
 		this.player.addEventListener("click", this.edit.bind(this));
 		this.toolbar = toolbar;
 		this.toolbar.prompter = this;
-		this.speech = speech;
-		speech.onspeechstart = this.onspeechstart.bind(this);
-		speech.onnomatch = console.log;
-		speech.onerror = (error: any) => {
+		this.recog = recog;
+		recog.onspeechstart = this.onspeechstart.bind(this);
+		recog.onnomatch = console.log;
+		recog.onerror = (error: any) => {
 			if (error.error == 'aborted') return;
 			if (error.error == 'no-speech') return;
 			container.classList.add("speech-error");
 			console.error("speech.onerror", error);
-			speech.abort();
+			recog.abort();
 			window.setTimeout(() => {
 				try {
-					speech.start();
+					recog.start();
 				} catch (error) {
 					console.log(error);
 				}
 				container.classList.remove("speech-error");
 			}, 200);
 		}
-		speech.onresult = this.onresult.bind(this);
-		speech.onend = (event: any) => {
+		recog.onresult = this.onresult.bind(this);
+		recog.onend = (event: any) => {
 			console.log("speech.onend", event);
 			container.classList.add("speech-ended");
-			speech.abort();
+			recog.abort();
 			window.setTimeout(() => {
 				try {
-					speech.start();
+					recog.start();
 				} catch (error) {
 					console.log(error);
 				}
 				container.classList.remove("speech-ended");
 			}, 200);
 		}
-		speech.start();
+		recog.start();
 	}
 
 	onspeechstart() {
 		console.log('speech started!');
 	}
 
+	previousSpeechResult: string = '';
+	filteredSpeechResult: string = '';
+	commandMode: boolean = false;
+
 	onresult(event: { results: SpeechRecognitionResultList }) {
-		let result = Array.from(event.results).map(r => r[0].transcript).join(' ').replace(/ +/g, ' ');
-		var hasSpeechActuallyChanged = this.latestResult != result;
+		let latestResult = Array.from(event.results).map(r => r[0].transcript).join(' ').replace(/ +/g, ' ');
+		// 		var hasSpeechActuallyChanged = this.previousSpeechResult != latestResult;
+		// 		if (!hasSpeechActuallyChanged) return;
+		// 		var phrase = Array.from(event.results).slice(-1)[0][0].transcript.toLowerCase();
+		// 		let matches = /ben(?:ed(?:ict(?:\s+(\w+))?)?)?$/i.exec(phrase);
+		// 		console.log("BEFOR: '" + latestResult + "'");
+		// 		console.log(matches);
+		// 		if (matches) {
+		// 			console.log("COMMAND");
+		// 			if (matches[1]) {
+		// 				this.runCommand(matches[1]);
+		// //				return;
+		// 			}
+		// 			latestResult = latestResult.slice(0,-matches[0].length);
+		// 		}
+		// 		console.log("AFTER: '" + latestResult + "'");
+		let hasSpeechActuallyChanged = this.previousSpeechResult != latestResult;
 		if (hasSpeechActuallyChanged) {
-			this.latestResult = result;
-			let [filteredSpeech, update] = this.filterAndApplyCommands(result);
-			if (update) this.updateSpeech(filteredSpeech);
+			let newWords = latestResult.substring(this.previousSpeechResult.length);
+			// if (/benedict/i.test(newWords)) debugger;
+			console.log("New Words: " + newWords);
+			let matches = /ben(?:ed(?:ict(?:\s+(\w+))?)?)?$/i.exec(newWords);
+			if (matches) {
+				if (matches[1] && this.runCommand(matches[1])) {
+					this.previousSpeechResult = latestResult;
+					this.updateSpeech();
+				}
+			} else {
+				this.filteredSpeechResult += newWords;
+				this.previousSpeechResult = latestResult;
+				this.updateSpeech();
+			}
 		}
 	}
 
-	filterAndApplyCommands(speech: string): [result: string, update: boolean] {
-		let update = true;
-		let lastTwoWords = speech.toLowerCase().split(' ').slice(-2);
-		if (lastTwoWords.length == 2 && lastTwoWords.includes("benedict")) {
-			update = false;
-			switch (lastTwoWords[1]) {
-				case "ben":
-				case "bened":
-				case "benedict": break;
-				case "bigger": this.updateTextSize(+1); break;
-				case "smaller": this.updateTextSize(-1); break;
-				case "wider": this.pad(-1); break;
-				case "narrower": this.pad(+1); break;
-				case "up": this.moveLine(-1); break;
-				case "down": this.moveLine(+1); break;
-				case "reset": this.reset(); break;
-				case "go": this.reset(); this.play(); break;
-				case "flip": this.flip("vflip"); break;
-				case "mirror": this.flip("hflip"); break;
-			}
+	runCommand(command: string): boolean {
+		console.log(`Running ${command}`);
+		switch (command) {
+			case "screen": this.toggleFullscreen(); return (true);
+			case "restart": this.rewind(/\n/); return true;
+			case "back": this.rewind(/[\.\?\!]/); return true;
+			case "bigger": this.updateTextSize(+1); return true;
+			case "smaller": this.updateTextSize(-1); return true;
+			case "wider": this.pad(-1); return true;
+			case "narrower": this.pad(+1); return true;
+			case "up": this.moveLine(-1); return true;
+			case "down": this.moveLine(+1); return true;
+			case "reset": this.reset(); return true;
+			case "go": this.reset(); this.play(); return true;
+			case "flip": this.flip("vflip"); return true;
+			case "mirror": this.flip("hflip"); return true;
 		}
-		let filteredSpeech = speech.replace(/ benedict \w+/g, ' ').replace(/ benedict$/, '');
-		return [filteredSpeech, update];
+		return false;
+	}
+
+	toggleFullscreen() {
+		if (document.fullscreenElement !== null) {
+			document.exitFullscreen();
+		} else {
+			document.documentElement.requestFullscreen();
+		}
 	}
 
 	init() {
@@ -141,7 +173,7 @@ export default class Prompter {
 
 	play() {
 		this.updateScript();
-		this.updateSpeech('');
+		this.updateSpeech();
 		localStorage.setItem("benedict-script", this.editor.value);
 		this.started = true;
 		this.player.style.display = "block";
@@ -151,16 +183,16 @@ export default class Prompter {
 
 	reset() {
 		this.container.classList.add("reset-flash");
-		this.speech.abort();
+		this.recog.abort();
 		window.setTimeout((() => {
 			this.position = 0;
 			this.guessSize = 0;
 			this.updateScript();
-			this.updateSpeech('');
+			this.updateSpeech();
 			this.updateScroll();
 			window.setTimeout((() => {
 				this.container.classList.remove("reset-flash");
-				this.speech.start()
+				this.recog.start()
 			}).bind(this), 200);
 		}).bind(this), 200);
 	}
@@ -239,7 +271,22 @@ export default class Prompter {
 		this.updateScroll();
 	}
 
-	updateSpeech(speech: string = ''): void {
+	rewind(regexp: RegExp) {
+		var script = this.matcher.fancyText;
+		console.log(script);
+		var index = this.position - 5;
+		while (index > 0 && !regexp.test(script[index])) index--;
+		var fancyText = script.substring(0, index);
+		console.log(fancyText);
+		var plainText = fancyText.replace(/\W+/g, ' ').toLowerCase()
+		console.log(plainText);
+		this.guessSize = 0;
+		this.position = index;
+		this.filteredSpeechResult = plainText;
+	}
+
+	updateSpeech(allowGuess: boolean = true): void {
+		var speech = this.filteredSpeechResult;
 		const WINDOW_SIZE = 50;
 		var script = this.matcher.fancyText;
 		var needle = speech.slice(-20);
@@ -247,8 +294,6 @@ export default class Prompter {
 		var index = this.matcher.match(needle, this.position, WINDOW_SIZE + this.guessSize);
 
 		this.scriptStatusElement.innerText = `haystack: ${this.matcher.haystack}`;
-		this.speechStatusElement.innerText = `needle: ${needle} position: ${this.position}, guessSize: ${this.guessSize}`;
-
 		this.toolbar.updateStatus(speech.slice(-50));
 		let hasAdvanced = index >= this.position;
 		let goneRunaway = index > (this.position + this.guessSize + this.lookahead);
@@ -256,12 +301,13 @@ export default class Prompter {
 			this.position = index;
 			this.guessSize = 0;
 		} else {
-			this.guessSize += 4;
+			if (allowGuess) this.guessSize += 4;
 		}
+		this.speechStatusElement.innerText = `index: ${index}, position: ${this.position}, guessSize: ${this.guessSize}, needle: '${needle}', `;
 		var matched = script.substring(0, this.position);
 		var guessed = script.substring(this.position, this.position + this.guessSize);
 		var lookaheadIndex = this.position + this.guessSize + this.lookahead;
-		while (script[lookaheadIndex] != ' ') lookaheadIndex++;
+		while (lookaheadIndex < script.length && script[lookaheadIndex] != ' ') lookaheadIndex++;
 		var lookahead = script.substring(this.position + this.guessSize, lookaheadIndex)
 		var remainder = script.substring(lookaheadIndex);
 		const PADDING = '\n\n\n\n\n\n\n\n\n\n';
