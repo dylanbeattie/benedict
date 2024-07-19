@@ -2,7 +2,7 @@ import Toolbar from './toolbar';
 import Matcher from './matcher';
 import { getCookie, setCookie } from './cookies';
 
-const fontSizes = ["32px", "48px", "64px", "80px", "96px", "128px", "144px", "192px"];
+const fontSizes = ["18px", "24px", "32px", "48px", "64px", "80px", "96px", "128px", "144px", "192px"];
 
 function position(el: HTMLElement) {
 	const { top, left } = el.getBoundingClientRect();
