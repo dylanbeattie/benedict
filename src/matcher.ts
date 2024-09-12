@@ -11,7 +11,7 @@ export default class Matcher {
 	}
 
 	updateScript(fancyText: string) {
-		this.fancyText = fancyText;
+		this.fancyText = fancyText.replace(/(\r?\n)(\s*\r?\n)*/g, '\n');
 		const [tokens, spaces] = fancyText.unzip();
 		this.tokens = tokens.map(t => t.toLowerCase());
 		this.spaces = spaces;
