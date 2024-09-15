@@ -66,7 +66,6 @@ export default class Prompter {
 		}
 		recog.onresult = this.onresult.bind(this);
 		recog.onend = (event: any) => {
-			console.log("speech.onend", event);
 			container.classList.add("speech-ended");
 			recog.abort();
 			window.setTimeout(() => {
@@ -91,21 +90,6 @@ export default class Prompter {
 
 	onresult(event: { results: SpeechRecognitionResultList }) {
 		let latestResult = Array.from(event.results).map(r => r[0].transcript).join(' ').replace(/ +/g, ' ');
-		// 		var hasSpeechActuallyChanged = this.previousSpeechResult != latestResult;
-		// 		if (!hasSpeechActuallyChanged) return;
-		// 		var phrase = Array.from(event.results).slice(-1)[0][0].transcript.toLowerCase();
-		// 		let matches = /ben(?:ed(?:ict(?:\s+(\w+))?)?)?$/i.exec(phrase);
-		// 		console.log("BEFOR: '" + latestResult + "'");
-		// 		console.log(matches);
-		// 		if (matches) {
-		// 			console.log("COMMAND");
-		// 			if (matches[1]) {
-		// 				this.runCommand(matches[1]);
-		// //				return;
-		// 			}
-		// 			latestResult = latestResult.slice(0,-matches[0].length);
-		// 		}
-		// 		console.log("AFTER: '" + latestResult + "'");
 		let hasSpeechActuallyChanged = this.previousSpeechResult != latestResult;
 		if (hasSpeechActuallyChanged) {
 			let newWords = latestResult.substring(this.previousSpeechResult.length);

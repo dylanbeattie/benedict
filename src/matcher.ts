@@ -11,6 +11,10 @@ export default class Matcher {
 	}
 
 	updateScript(fancyText: string) {
+		fancyText = fancyText.replace(/\\/g, "");
+		fancyText = fancyText.replace(/</g, "⟨");
+		fancyText = fancyText.replace(/>/g, "⟩");
+		fancyText = fancyText.replace(/&/g, "＆");
 		this.fancyText = fancyText.replace(/(\r?\n)(\s*\r?\n)*/g, '\n');
 		const [tokens, spaces] = fancyText.unzip();
 		this.tokens = tokens.map(t => t.toLowerCase());
